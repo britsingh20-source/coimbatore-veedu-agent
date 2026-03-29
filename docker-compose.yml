@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  telecalling-agent:
+    build: .
+    container_name: coimbatore-veedu-agent
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - BUSINESS_NAME=Coimbatoreveedubuilders
+      - GOOGLE_CALENDAR_ID=${GOOGLE_CALENDAR_ID:-primary}
+      - GOOGLE_SERVICE_ACCOUNT_FILE=/app/credentials/service_account.json
+      - CALENDAR_TIMEZONE=${CALENDAR_TIMEZONE:-Asia/Kolkata}
+      - APPOINTMENT_DURATION=${APPOINTMENT_DURATION:-60}
+      - TWILIO_VOICE=${TWILIO_VOICE:-Polly.Aditi}
+      - TWILIO_LANGUAGE=${TWILIO_LANGUAGE:-en-IN}
+    volumes:
+      - ./credentials/service_account.json:/app/credentials/service_account.json:ro
+      - leads_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+volumes:
+  leads_data:
